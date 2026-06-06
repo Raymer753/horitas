@@ -1,8 +1,13 @@
-# 🕐 Horitas
+# Horitas
+
+[![Tests](https://github.com/Raymer753/horitas/actions/workflows/test.yml/badge.svg)](https://github.com/Raymer753/horitas/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-2496ED.svg)](https://github.com/Raymer753/horitas/pkgs/container/horitas)
 
 Bot de Discord que anuncia la hora en voz cada hora en punto. Se conecta al canal de voz con más usuarios, reproduce una secuencia de audio (intro → anuncio TTS → outro) y se desconecta.
 
-## ✨ Características
+## Características
 
 - **Anuncio automático** cada hora en punto
 - **Multi-servidor** — funciona en varios servidores simultáneamente
@@ -13,7 +18,7 @@ Bot de Discord que anuncia la hora en voz cada hora en punto. Se conecta al cana
 - **Docker** — despliegue con un solo comando
 - **Healthcheck** integrado para monitoreo
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 ### Con Docker (recomendado)
 
@@ -34,7 +39,7 @@ cp .env.example .env    # Edita con tu DISCORD_TOKEN
 python -m src.main
 ```
 
-## ⚙️ Configuración
+## Configuración
 
 Copia `.env.example` a `.env` y configura:
 
@@ -45,7 +50,7 @@ Copia `.env.example` a `.env` y configura:
 | `DEFAULT_TZ` | ❌ | `Europe/Madrid` | Timezone por defecto |
 | `LOG_LEVEL` | ❌ | `INFO` | Nivel de log |
 
-## 🎵 Audio
+## Audio
 
 Los sonidos se organizan en pools dentro de `audio/`:
 
@@ -72,7 +77,7 @@ Edita `audio/phrases.json` para personalizar el texto que dice el bot:
 
 La variable `{hora}` se reemplaza automáticamente (ej: "las 3", "la 1").
 
-## 🤖 Comandos
+## Comandos
 
 | Comando | Acceso | Descripción |
 |---------|--------|-------------|
@@ -83,7 +88,7 @@ La variable `{hora}` se reemplaza automáticamente (ej: "las 3", "la 1").
 | `/config canal <modo>` | Admin | Configura modo de canal |
 | `/config activar <on/off>` | Admin | Activa/desactiva anuncios |
 
-## 🧪 Tests
+## Tests
 
 ```bash
 # Instalar dependencias de desarrollo
@@ -96,7 +101,7 @@ make test
 pytest tests/ -v --cov=src --cov-report=term-missing
 ```
 
-## 📦 Despliegue
+## Despliegue
 
 ### Docker Compose
 
@@ -120,6 +125,6 @@ git tag v1.0.0
 git push --tags
 ```
 
-## 📄 Licencia
+## Licencia
 
 MIT — ver [LICENSE](LICENSE).
