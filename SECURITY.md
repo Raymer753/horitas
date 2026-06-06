@@ -10,7 +10,7 @@
 
 Si encuentras una vulnerabilidad de seguridad, **no abras un issue público**. En su lugar:
 
-1. Envía un email a **garciaizan56@protonmail.com** con:
+1. Abre una Issue específica de vulnerabilidad, que contenga:
    - Descripción de la vulnerabilidad
    - Pasos para reproducirla
    - Impacto potencial
