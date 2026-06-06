@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Audio — Horitas Admin{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-music-note-list me-2"></i>Audio Pools</h2>
+
+<div class="row g-4">
+    <!-- Intro Pool -->
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Intro</h5>
+                <span class="badge bg-primary">{{ intro_files|length }} archivo{{ 's' if intro_files|length != 1 }}</span>
+            </div>
+            <div class="card-body">
+                {% if intro_files %}
+                <ul class="list-group list-group-flush mb-3">
+                    {% for f in intro_files %}
+                    <li class="list-group-item bg-dark d-flex justify-content-between align-items-center border-secondary">
+                        <span>
+                            <i class="bi bi-file-music me-2"></i>{{ f.name }}
+                            <small class="text-muted ms-2">{{ f.size_kb }} KB</small>
+                        </span>
+                        <form method="POST" action="{{ url_for('audio_delete') }}" class="d-inline">
+                            <input type="hidden" name="pool" value="intro">
+                            <input type="hidden" name="filename" value="{{ f.name }}">
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm confirm-delete"
+                                    data-name="{{ f.name }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted text-center my-3">No hay archivos de intro</p>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('audio_upload') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="pool" value="intro">
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control bg-dark text-light border-secondary" name="file" accept=".mp3,.ogg,.wav">
+                        <button type="submit" class="btn btn-outline-success">
+                            <i class="bi bi-upload me-1"></i>Subir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outro Pool -->
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-stop-circle me-2"></i>Outro</h5>
+                <span class="badge bg-primary">{{ outro_files|length }} archivo{{ 's' if outro_files|length != 1 }}</span>
+            </div>
+            <div class="card-body">
+                {% if outro_files %}
+                <ul class="list-group list-group-flush mb-3">
+                    {% for f in outro_files %}
+                    <li class="list-group-item bg-dark d-flex justify-content-between align-items-center border-secondary">
+                        <span>
+                            <i class="bi bi-file-music me-2"></i>{{ f.name }}
+                            <small class="text-muted ms-2">{{ f.size_kb }} KB</small>
+                        </span>
+                        <form method="POST" action="{{ url_for('audio_delete') }}" class="d-inline">
+                            <input type="hidden" name="pool" value="outro">
+                            <input type="hidden" name="filename" value="{{ f.name }}">
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm confirm-delete"
+                                    data-name="{{ f.name }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted text-center my-3">No hay archivos de outro</p>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('audio_upload') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="pool" value="outro">
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control bg-dark text-light border-secondary" name="file" accept=".mp3,.ogg,.wav">
+                        <button type="submit" class="btn btn-outline-success">
+                            <i class="bi bi-upload me-1"></i>Subir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Formatos soportados: <strong>.mp3</strong>, <strong>.ogg</strong>, <strong>.wav</strong>.
+        El bot elige un archivo aleatorio de cada pool en cada anuncio.
+    </div>
+</div>
+{% endblock %}

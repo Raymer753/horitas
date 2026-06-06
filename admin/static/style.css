@@ -1,0 +1,63 @@
+/* Horitas Admin — Custom styles */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #1a1d21;
+}
+
+main {
+    flex: 1;
+}
+
+/* Cards */
+.card {
+    transition: border-color 0.2s ease;
+}
+
+.card:hover {
+    border-color: #6c757d !important;
+}
+
+/* Navbar active link */
+.nav-link.active {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+/* Table inputs (phrases) */
+.table input.form-control {
+    background-color: transparent;
+    border-color: transparent;
+    transition: border-color 0.2s ease;
+}
+
+.table input.form-control:focus {
+    background-color: #212529;
+    border-color: #0d6efd;
+}
+
+/* File input styling */
+input[type="file"]::file-selector-button {
+    background-color: #2b3035;
+    color: #fff;
+    border: none;
+}
+
+/* Alert info custom color */
+.alert-info {
+    background-color: #1a2332;
+    border-color: #2a4060;
+    color: #8bb9e0;
+}
+
+/* Badge spacing */
+.badge {
+    font-weight: 500;
+}
+
+/* Code styling */
+code {
+    color: #e0a0ff;
+}

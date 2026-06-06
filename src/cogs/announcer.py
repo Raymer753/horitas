@@ -128,9 +128,9 @@ class AnnouncerCog(commands.Cog, name="Announcer"):
         hour_24, hour_12 = scheduler.get_current_hour(timezone_str)
         hour_text = tts_service.format_hour_text(hour_12)
 
-        # Get the phrase for this hour
-        phrase = phrase_service.get_phrase(
-            self.config.phrases_path, hour_24, hour_text
+        # Get the phrase for this hour (DB → JSON → hardcoded)
+        phrase = await phrase_service.get_phrase_with_db(
+            self.db, self.config.phrases_path, hour_24, hour_text
         )
 
         logger.info(
