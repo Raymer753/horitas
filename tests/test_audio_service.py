@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -88,7 +88,10 @@ class TestPlayAudio:
         assert result is False
 
     @pytest.mark.asyncio
-    async def test_successful_playback(self, mock_voice_client: MagicMock, tmp_path: Path) -> None:
+    @patch("src.services.audio.discord.FFmpegPCMAudio")
+    async def test_successful_playback(
+        self, mock_ffmpeg: MagicMock, mock_voice_client: MagicMock, tmp_path: Path
+    ) -> None:
         """Successful playback should return True."""
         audio_file = tmp_path / "test.mp3"
         audio_file.write_bytes(b"fake audio")
@@ -97,7 +100,10 @@ class TestPlayAudio:
         mock_voice_client.play.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_delete_after(self, mock_voice_client: MagicMock, tmp_path: Path) -> None:
+    @patch("src.services.audio.discord.FFmpegPCMAudio")
+    async def test_delete_after(
+        self, mock_ffmpeg: MagicMock, mock_voice_client: MagicMock, tmp_path: Path
+    ) -> None:
         """delete_after=True should remove the file after playback."""
         audio_file = tmp_path / "temp.mp3"
         audio_file.write_bytes(b"fake audio")
@@ -105,3 +111,4 @@ class TestPlayAudio:
 
         await play_audio(mock_voice_client, audio_file, delete_after=True)
         assert not audio_file.exists()
+
