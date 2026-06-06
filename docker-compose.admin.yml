@@ -12,7 +12,7 @@ services:
       - .env
     volumes:
       - ./audio:/app/audio
-      - horitas-data:/app/data
+      - ./data:/app/data
     depends_on:
       horitas-bot:
         condition: service_healthy

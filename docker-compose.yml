@@ -15,6 +15,3 @@ services:
       start_period: 30s
       retries: 3
 
-volumes:
-  horitas-data:
-    driver: local
