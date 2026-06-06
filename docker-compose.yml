@@ -7,7 +7,7 @@ services:
       - .env
     volumes:
       - ./audio:/app/audio:ro
-      - horitas-data:/app/data
+      - ./data:/app/data
     healthcheck:
       test: ["CMD", "python", "-c", "import os, time; f='/app/data/healthcheck'; exit(0 if os.path.exists(f) and time.time() - os.path.getmtime(f) < 120 else 1)"]
       interval: 30s
