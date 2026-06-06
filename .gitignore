@@ -1,0 +1,46 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project — persistent data (created at runtime)
+data/
+!data/.gitkeep
+
+# Project — user audio pools (personal sounds, not tracked)
+# The pool directories themselves are tracked (with .gitkeep),
+# but their contents are user-specific
+audio/intro/*
+!audio/intro/.gitkeep
+audio/outro/*
+!audio/outro/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp

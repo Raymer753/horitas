@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+.env.*
+
+# Documentation
+*.md
+!README.md
+LICENSE
+
+# Tests (not needed in production image)
+tests/
+.pytest_cache/
+
+# Dev tools
+.vscode/
+.idea/
+Makefile
+.github/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Docker compose overrides
+docker-compose.admin.yml
+
+# Persistent data (mounted as volume, not baked in)
+data/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,20 @@
+services:
+  horitas-bot:
+    build: .
+    container_name: horitas-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./audio:/app/audio:ro
+      - horitas-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os, time; f='/app/data/healthcheck'; exit(0 if os.path.exists(f) and time.time() - os.path.getmtime(f) < 120 else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  horitas-data:
+    driver: local

@@ -1,0 +1,13 @@
+{
+  "0": "Medianoche, ¿sigues despierto? Son {hora}",
+  "1": "Es {hora} de la mañana, ¡a dormir!",
+  "5": "Son {hora} de la mañana, mira por la ventana",
+  "7": "Son {hora}, ¡hora de levantarse!",
+  "8": "Son {hora}, ¡arriba!",
+  "12": "¡Mediodía! Son {hora}, hora de comer",
+  "14": "Son {hora}, ¡vuelta al trabajo!",
+  "17": "Son {hora}, la tarde avanza",
+  "20": "Son {hora} de la tarde, ¡hora de cenar!",
+  "22": "Son {hora} de la noche, ve pensando en descansar",
+  "default": "Son {hora} en punto"
+}

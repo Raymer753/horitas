@@ -1,0 +1,18 @@
+# Docker Compose override — adds the optional web admin panel
+# Usage: docker compose -f docker-compose.yml -f docker-compose.admin.yml up -d
+
+services:
+  horitas-admin:
+    build: ./admin
+    container_name: horitas-admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./audio:/app/audio
+      - horitas-data:/app/data
+    depends_on:
+      horitas-bot:
+        condition: service_healthy
