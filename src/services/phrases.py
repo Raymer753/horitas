@@ -9,7 +9,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 # Default phrase when no custom phrase is defined for an hour
-DEFAULT_PHRASE = "Son las {hora} en punto"
+DEFAULT_PHRASE = "Son {hora} en punto"
 
 
 def get_phrase(phrases_path: Path, hour_24: int, hour_text: str) -> str:

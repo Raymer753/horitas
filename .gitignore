@@ -44,3 +44,6 @@ audio/outro/*
 # Temporary files
 *.tmp
 *.temp
+
+# Test Results
+.coverage

@@ -50,11 +50,14 @@ horitas/
 │   ├── __init__.py
 │   ├── conftest.py         # Shared fixtures and mocks
 │   ├── test_config.py
+│   ├── test_database.py
 │   ├── test_audio_service.py
 │   ├── test_tts_service.py
 │   ├── test_phrases_service.py
 │   ├── test_scheduler.py
-│   └── test_announcer.py
+│   ├── test_announcer.py
+│   ├── test_logging.py
+│   └── test_paths.py
 ├── admin/                  # Optional Flask web admin (Phase 2, not yet)
 ├── .github/workflows/      # CI/CD pipelines
 │   ├── test.yml            # Run tests on every PR
