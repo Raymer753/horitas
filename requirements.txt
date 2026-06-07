@@ -1,6 +1,6 @@
 # Production dependencies
 discord.py[voice]>=2.3,<3.0
 gTTS>=2.5.4,<3.0
-aiosqlite>=0.19,<1.0
+aiosqlite>=0.22.1,<1.0
 pytz>=2026.2
 python-dotenv>=1.0,<2.0
