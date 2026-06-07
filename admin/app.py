@@ -16,6 +16,7 @@ from flask import (
     session,
     url_for,
 )
+from werkzeug.utils import secure_filename
 
 from database import AdminDatabase
 
@@ -188,12 +189,25 @@ def audio_upload():
         flash(f"Formato no permitido: {ext}. Usa: {', '.join(ALLOWED_AUDIO_EXTENSIONS)}", "danger")
         return redirect(url_for("audio"))
 
+    safe_filename = secure_filename(Path(filename).name)
+    if not safe_filename:
+        flash("Nombre de archivo inválido.", "danger")
+        return redirect(url_for("audio"))
+
     # Save file
     pool_dir = AUDIO_DIR / pool
     pool_dir.mkdir(parents=True, exist_ok=True)
-    dest = pool_dir / filename
-    file.save(str(dest))
-    flash(f"Archivo '{filename}' subido a {pool}/.", "success")
+    pool_dir_resolved = pool_dir.resolve()
+    dest = pool_dir / safe_filename
+    dest_resolved = dest.resolve()
+    try:
+        dest_resolved.relative_to(pool_dir_resolved)
+    except ValueError:
+        flash("Ruta de archivo inválida.", "danger")
+        return redirect(url_for("audio"))
+
+    file.save(str(dest_resolved))
+    flash(f"Archivo '{safe_filename}' subido a {pool}/.", "success")
 
     return redirect(url_for("audio"))
 
