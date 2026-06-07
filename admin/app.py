@@ -223,16 +223,16 @@ def audio_delete():
         flash("Parámetros inválidos.", "danger")
         return redirect(url_for("audio"))
 
-    # Validate filename to avoid traversal and unexpected file types
-    file_name_only = Path(filename).name
-    ext = Path(filename).suffix.lower()
-    if file_name_only != filename or ext not in ALLOWED_AUDIO_EXTENSIONS:
+    # Sanitize and validate filename to avoid traversal and unexpected file types
+    safe_filename = secure_filename(filename)
+    ext = Path(safe_filename).suffix.lower()
+    if not safe_filename or safe_filename != filename or ext not in ALLOWED_AUDIO_EXTENSIONS:
         flash("Nombre de archivo o formato inválido.", "danger")
         return redirect(url_for("audio"))
 
     # Security: ensure resolved target stays within the pool directory
     base_dir = (AUDIO_DIR / pool).resolve()
-    filepath = (base_dir / filename).resolve()
+    filepath = (base_dir / safe_filename).resolve()
     try:
         filepath.relative_to(base_dir)
     except ValueError:
@@ -241,9 +241,9 @@ def audio_delete():
 
     if filepath.exists():
         filepath.unlink()
-        flash(f"Archivo '{filename}' eliminado de {pool}/.", "success")
+        flash(f"Archivo '{safe_filename}' eliminado de {pool}/.", "success")
     else:
-        flash(f"Archivo '{filename}' no encontrado.", "warning")
+        flash(f"Archivo '{safe_filename}' no encontrado.", "warning")
 
     return redirect(url_for("audio"))
 
