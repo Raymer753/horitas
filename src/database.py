@@ -1,4 +1,4 @@
-"""SQLite data layer for per-guild configuration."""
+"""SQLite data layer for per-guild configuration and phrases."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ DEFAULTS = {
 
 
 class Database:
-    """Async SQLite database for guild configuration.
+    """Async SQLite database for guild configuration and phrases.
 
     Usage:
         db = Database(path)
@@ -59,8 +59,16 @@ class Database:
                 enabled INTEGER DEFAULT 1
             )
         """)
+        await self._conn.execute("""
+            CREATE TABLE IF NOT EXISTS phrases (
+                hour_key TEXT PRIMARY KEY,
+                phrase TEXT NOT NULL
+            )
+        """)
         await self._conn.commit()
         logger.debug("Database migration complete")
+
+    # ── Guild Config ─────────────────────────────
 
     async def get_guild_config(self, guild_id: int) -> dict:
         """Get configuration for a guild. Returns defaults if not configured.
@@ -128,3 +136,73 @@ class Database:
         )
         rows = await cursor.fetchall()
         return [row["guild_id"] for row in rows]
+
+    # ── Phrases ──────────────────────────────────
+
+    async def get_all_phrases(self) -> dict[str, str]:
+        """Get all phrases from the database.
+
+        Returns:
+            Dict mapping hour_key (str) to phrase text.
+            Keys are "0"-"23" for specific hours, "default" for fallback.
+        """
+        assert self._conn is not None
+        cursor = await self._conn.execute("SELECT hour_key, phrase FROM phrases")
+        rows = await cursor.fetchall()
+        return {row["hour_key"]: row["phrase"] for row in rows}
+
+    async def get_phrase(self, hour_key: str) -> str | None:
+        """Get a single phrase by hour key.
+
+        Args:
+            hour_key: "0"-"23" or "default".
+
+        Returns:
+            Phrase text, or None if not set.
+        """
+        assert self._conn is not None
+        cursor = await self._conn.execute(
+            "SELECT phrase FROM phrases WHERE hour_key = ?",
+            (hour_key,),
+        )
+        row = await cursor.fetchone()
+        return row["phrase"] if row else None
+
+    async def set_phrase(self, hour_key: str, phrase: str) -> None:
+        """Set or update a phrase for a specific hour (upsert).
+
+        Args:
+            hour_key: "0"-"23" or "default".
+            phrase: The phrase text (may contain {hora} placeholder).
+        """
+        assert self._conn is not None
+        await self._conn.execute(
+            """
+            INSERT INTO phrases (hour_key, phrase) VALUES (?, ?)
+            ON CONFLICT(hour_key) DO UPDATE SET phrase=excluded.phrase
+            """,
+            (hour_key, phrase),
+        )
+        await self._conn.commit()
+        logger.info("Phrase for hour '%s' updated: '%s'", hour_key, phrase)
+
+    async def delete_phrase(self, hour_key: str) -> bool:
+        """Delete a phrase for a specific hour.
+
+        Args:
+            hour_key: "0"-"23" or "default".
+
+        Returns:
+            True if a phrase was deleted, False if it didn't exist.
+        """
+        assert self._conn is not None
+        cursor = await self._conn.execute(
+            "DELETE FROM phrases WHERE hour_key = ?",
+            (hour_key,),
+        )
+        await self._conn.commit()
+        deleted = cursor.rowcount > 0
+        if deleted:
+            logger.info("Phrase for hour '%s' deleted", hour_key)
+        return deleted
+

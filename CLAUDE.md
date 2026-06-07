@@ -34,16 +34,31 @@ horitas/
 │   │   ├── __init__.py
 │   │   ├── audio.py        # Audio playback + random pool selection
 │   │   ├── tts.py          # TTS generation (gTTS, async, with fallback)
-│   │   ├── phrases.py      # Dynamic phrases per hour from JSON
+│   │   ├── phrases.py      # Dynamic phrases: DB → JSON → hardcoded fallback
 │   │   └── scheduler.py    # Precise next-hour delay calculation
 │   └── utils/              # Shared utilities
 │       ├── __init__.py
 │       ├── logging.py      # Structured logging setup (no print!)
 │       └── paths.py        # Absolute path resolution (no cwd dependency)
-├── audio/                  # Audio files (Docker volume, read-only)
-│   ├── intro/              # Pool: random intro sounds (e.g. bells.mp3)
-│   ├── outro/              # Pool: random outro sounds (e.g. final.mp3)
-│   └── phrases.json        # Custom phrases per hour ({hora} variable)
+    ├── admin/                  # Optional Flask web admin panel
+    │   ├── Dockerfile          # Separate container (python:3.12-slim)
+    │   ├── app.py              # Flask app (routes + auth)
+    │   ├── database.py         # Synchronous SQLite (stdlib, WAL mode)
+    │   ├── requirements.txt    # Flask >=3.0
+    │   ├── templates/          # Jinja2 templates (Bootstrap 5 dark)
+    │   │   ├── base.html       # Layout with navbar
+    │   │   ├── login.html      # Password auth
+    │   │   ├── dashboard.html  # Bot status overview
+    │   │   ├── phrases.html    # CRUD phrases per hour
+    │   │   ├── audio.html      # Upload/delete audio files
+    │   │   └── config.html     # Per-guild config
+    │   └── static/             # CSS + JS
+    │       ├── style.css
+    │       └── app.js
+    ├── audio/                  # Audio files (Docker volume, read-only)
+    │   ├── intro/              # Pool: random intro sounds (e.g. bells.mp3)
+    │   ├── outro/              # Pool: random outro sounds (e.g. final.mp3)
+    │   └── phrases.json.example # Template for custom phrases (copy to phrases.json)
 ├── data/                   # Persistent data (Docker volume, gitignored)
 │   └── config.db           # SQLite database (auto-created)
 ├── tests/                  # pytest test suite (mocks, no token needed)
@@ -58,7 +73,7 @@ horitas/
 │   ├── test_announcer.py
 │   ├── test_logging.py
 │   └── test_paths.py
-├── admin/                  # Optional Flask web admin (Phase 2, not yet)
+    ├── CONTRIBUTING.md        # Contributor guide
 ├── .github/workflows/      # CI/CD pipelines
 │   ├── test.yml            # Run tests on every PR
 │   └── release.yml         # Build + push to ghcr.io on tag v*
@@ -86,6 +101,8 @@ horitas/
 | `LOG_LEVEL` | ❌ | `INFO` | Python logging level (DEBUG/INFO/WARNING/ERROR) |
 | `AUDIO_DIR` | ❌ | `/app/audio` | Path to audio files directory |
 | `DATA_DIR` | ❌ | `/app/data` | Path to persistent data directory |
+| `ADMIN_PASSWORD` | ⚠️ | — | Password for admin panel (required if using admin) |
+| `ADMIN_SECRET_KEY` | ❌ | auto | Flask session secret (auto-generated if not set) |
 
 ## Architecture Decisions
 
@@ -96,7 +113,10 @@ horitas/
 5. **Timezone-aware**: All datetime operations use timezone-aware objects via `pytz`
 6. **Graceful degradation**: gTTS failure → log warning, continue without TTS. Empty pool → warning, skip that step
 7. **No print()**: All output uses Python `logging` module with structured format
-8. **Absolute paths**: `pathlib.Path` resolved from config — never rely on cwd
+8. **Phrase fallback**: DB → `phrases.json` → hardcoded default. Admin panel writes to DB, bot without admin reads from JSON
+9. **Admin panel**: Separate Flask container shares DB/audio via Docker volumes. Auth via password env var
+10. **Example files pattern**: `.env.example` and `phrases.json.example` are tracked; `.env` and `phrases.json` are gitignored
+11. **Absolute paths**: `pathlib.Path` resolved from config — never rely on cwd
 
 ## Audio Sequence
 
@@ -126,11 +146,17 @@ CREATE TABLE IF NOT EXISTS guild_config (
     channel_id INTEGER DEFAULT NULL,
     enabled INTEGER DEFAULT 1
 );
+
+CREATE TABLE IF NOT EXISTS phrases (
+    hour_key TEXT PRIMARY KEY,    -- "0"-"23" or "default"
+    phrase TEXT NOT NULL           -- may contain {hora} placeholder
+);
 ```
 
 - Auto-created on first run via migrations in `database.py`
 - Missing guild → defaults applied automatically
 - Modes: `mas_usuarios` (most users), `canal_fijo` (fixed channel)
+- Phrases table used by admin panel; empty table → falls back to `phrases.json`
 
 ## Testing
 
@@ -150,15 +176,17 @@ All tests use `unittest.mock.AsyncMock` — no real Discord connection required.
 ## Docker
 
 ```bash
-# Development (bot only)
+# Bot only
 docker compose up -d
 
-# With web admin (optional, Phase 2)
+# Bot + Admin panel (set ADMIN_PASSWORD in .env first)
 docker compose -f docker-compose.yml -f docker-compose.admin.yml up -d
 
 # Check health
 docker inspect --format='{{.State.Health.Status}}' horitas-bot
 ```
+
+Admin panel runs at `http://127.0.0.1:8080` (local only).
 
 ## Code Conventions
 
@@ -179,3 +207,6 @@ docker inspect --format='{{.State.Health.Status}}' horitas-bot
 - `%-I` strftime format is Linux-only — use `%I` with `.lstrip('0')` for portability
 - Slash commands are NOT auto-synced — use `/sync` manually after deployment
 - SQLite DB lives in `data/` volume — survives container restarts
+- `phrases.json` is gitignored — copy from `phrases.json.example` to customize
+- Admin panel uses synchronous `sqlite3` (not `aiosqlite`) with WAL mode for safe concurrent access with the bot
+- Admin `database.py` is a separate file from bot `database.py` — same schema, different async models

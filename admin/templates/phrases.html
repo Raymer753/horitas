@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Frases — Horitas Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-chat-quote me-2"></i>Frases por hora</h2>
+    <span class="text-muted">Usa <code>{hora}</code> para insertar la hora automáticamente</span>
+</div>
+
+<div class="card bg-dark border-secondary">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 140px;">Hora</th>
+                        <th>Frase</th>
+                        <th style="width: 120px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in phrases %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.hour_label }}</strong>
+                            {% if item.has_phrase %}
+                            <i class="bi bi-circle-fill text-success ms-2" style="font-size: 0.5rem;" title="Personalizada"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('phrases_save') }}" class="d-flex gap-2" id="form-{{ item.hour_key }}">
+                                <input type="hidden" name="hour_key" value="{{ item.hour_key }}">
+                                <input type="text"
+                                       class="form-control form-control-sm bg-dark text-light border-secondary"
+                                       name="phrase"
+                                       value="{{ item.phrase }}"
+                                       placeholder="Sin frase personalizada (usa default o JSON)">
+                            </form>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button type="submit"
+                                        form="form-{{ item.hour_key }}"
+                                        class="btn btn-outline-primary"
+                                        title="Guardar">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                {% if item.has_phrase %}
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        title="Eliminar"
+                                        onclick="deletePhrase('{{ item.hour_key }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form for deletion -->
+<form id="delete-form" method="POST" action="{{ url_for('phrases_save') }}">
+    <input type="hidden" name="hour_key" id="delete-hour-key">
+    <input type="hidden" name="phrase" value="">
+</form>
+
+<div class="mt-3">
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Prioridad de frases:</strong> Base de datos → phrases.json → Frase por defecto hardcoded.
+        Las frases aquí tienen prioridad sobre el archivo JSON.
+    </div>
+</div>
+{% endblock %}

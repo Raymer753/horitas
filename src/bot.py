@@ -59,6 +59,12 @@ class HoritasBot(commands.Bot):
             len(self.guilds),
         )
 
+        # Ensure all guilds have a config row in the DB (for admin panel visibility)
+        for guild in self.guilds:
+            config = await self.db.get_guild_config(guild.id)
+            await self.db.set_guild_config(guild.id, **config)
+        logger.debug("Registered %d guild(s) in database", len(self.guilds))
+
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ) -> None:
