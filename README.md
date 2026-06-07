@@ -124,7 +124,7 @@ docker inspect --format='{{.State.Health.Status}}' horitas-bot
 Al crear un tag `vX.Y.Z`, GitHub Actions construye y publica la imagen en `ghcr.io`:
 
 ```bash
-git tag v1.0.0
+git tag v1.1.0
 git push --tags
 ```
 
