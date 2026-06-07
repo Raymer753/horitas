@@ -223,9 +223,19 @@ def audio_delete():
         flash("Parámetros inválidos.", "danger")
         return redirect(url_for("audio"))
 
-    # Security: prevent path traversal
-    filepath = (AUDIO_DIR / pool / filename).resolve()
-    if not str(filepath).startswith(str((AUDIO_DIR / pool).resolve())):
+    # Validate filename to avoid traversal and unexpected file types
+    file_name_only = Path(filename).name
+    ext = Path(filename).suffix.lower()
+    if file_name_only != filename or ext not in ALLOWED_AUDIO_EXTENSIONS:
+        flash("Nombre de archivo o formato inválido.", "danger")
+        return redirect(url_for("audio"))
+
+    # Security: ensure resolved target stays within the pool directory
+    base_dir = (AUDIO_DIR / pool).resolve()
+    filepath = (base_dir / filename).resolve()
+    try:
+        filepath.relative_to(base_dir)
+    except ValueError:
         flash("Ruta no permitida.", "danger")
         return redirect(url_for("audio"))
 
