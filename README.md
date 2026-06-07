@@ -11,7 +11,7 @@ Bot de Discord que anuncia la hora en voz cada hora en punto. Se conecta al cana
 
 - **Anuncio automático** cada hora en punto
 - **Multi-servidor** — funciona en varios servidores simultáneamente
-- **Frases dinámicas** por hora (configurables via JSON)
+- **Frases dinámicas** por hora (configurables via JSON o panel web)
 - **Pools de audio** — sonidos de intro/outro aleatorios
 - **Timezone por servidor** — cada servidor puede tener su propia zona horaria
 - **Slash commands** — `/forzar`, `/estado`, `/config`
@@ -25,7 +25,8 @@ Bot de Discord que anuncia la hora en voz cada hora en punto. Se conecta al cana
 ```bash
 git clone https://github.com/Raymer753/horitas.git
 cd horitas
-cp .env.example .env    # Edita con tu DISCORD_TOKEN
+cp .env.example .env                      # Edita con tu DISCORD_TOKEN
+cp audio/phrases.json.example audio/phrases.json  # Personaliza las frases
 docker compose up -d
 ```
 
@@ -35,7 +36,8 @@ docker compose up -d
 # Requisitos: Python 3.12+, ffmpeg
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env    # Edita con tu DISCORD_TOKEN
+cp .env.example .env                      # Edita con tu DISCORD_TOKEN
+cp audio/phrases.json.example audio/phrases.json  # Personaliza las frases
 python -m src.main
 ```
 
@@ -56,16 +58,17 @@ Los sonidos se organizan en pools dentro de `audio/`:
 
 ```
 audio/
-├── intro/       ← Sonidos de entrada (se elige uno aleatorio)
-├── outro/       ← Sonidos de salida (se elige uno aleatorio)
-└── phrases.json ← Frases personalizadas por hora
+├── intro/                ← Sonidos de entrada (se elige uno aleatorio)
+├── outro/                ← Sonidos de salida (se elige uno aleatorio)
+├── phrases.json.example  ← Plantilla de frases (copiar a phrases.json)
+└── phrases.json          ← Tus frases personalizadas (gitignored)
 ```
 
 Para añadir sonidos, simplemente copia archivos `.mp3`, `.ogg` o `.wav` a las carpetas correspondientes.
 
 ### Frases personalizadas
 
-Edita `audio/phrases.json` para personalizar el texto que dice el bot:
+Copia la plantilla y edita `audio/phrases.json`:
 
 ```json
 {
@@ -121,9 +124,30 @@ docker inspect --format='{{.State.Health.Status}}' horitas-bot
 Al crear un tag `vX.Y.Z`, GitHub Actions construye y publica la imagen en `ghcr.io`:
 
 ```bash
-git tag v1.0.0
+git tag v1.1.0
 git push --tags
 ```
+
+## Panel de Administración (opcional)
+
+Horitas incluye un panel web para gestionar frases, audios y configuración sin editar archivos manualmente.
+
+```bash
+# Añade una contraseña al .env
+echo "ADMIN_PASSWORD=tu_contraseña" >> .env
+
+# Levanta bot + panel
+docker compose -f docker-compose.yml -f docker-compose.admin.yml up -d
+```
+
+Accede a `http://127.0.0.1:8080` y entra con tu contraseña.
+
+| Sección | Función |
+|---------|---------|
+| Dashboard | Estado del bot, servidores y estadísticas |
+| Frases | Editar frases por hora (tienen prioridad sobre `phrases.json`) |
+| Audio | Subir/eliminar archivos de los pools intro/outro |
+| Servidores | Configurar timezone, modo y activar/desactivar por servidor |
 
 ## Licencia
 
