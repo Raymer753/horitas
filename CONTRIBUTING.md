@@ -41,6 +41,9 @@ source .venv/bin/activate
 # Instalar dependencias (incluye dev)
 pip install -r requirements-dev.txt
 
+# Copiar archivos de configuración
+cp audio/phrases.json.example audio/phrases.json
+
 # Ejecutar tests
 make test
 ```
@@ -69,7 +72,7 @@ src/
 ├── services/        # Lógica de negocio (SIN imports de Discord)
 │   ├── audio.py     # Playback + pools
 │   ├── tts.py       # gTTS
-│   ├── phrases.py   # Frases dinámicas
+│   ├── phrases.py   # Frases dinámicas (DB → JSON → hardcoded)
 │   └── scheduler.py # Cálculo de próxima hora
 └── utils/           # Utilidades compartidas
 ```
